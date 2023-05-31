@@ -1,7 +1,7 @@
 # LDMXML
 This project was a Machine Learning project for my Master Thesis, the goal of which was to use Artificial Neural Networks (ANNs) to classify events from the Light Dark Matter eXperiment depending on the number of electrons in each event.  
 
-The project uses simulated data generated via the the LDMX software (https://github.com/LDMX-Software/ldmx-sw).  The data is produced in a series of ROOT files and so Uproot is necessary for dealing with the data. The project is built in python 3.10 and is built with Tensorflow and Keras as well as PyTorch Geometric. 
+The project uses simulated data generated via the the LDMX software (https://github.com/LDMX-Software/ldmx-sw).  The data is produced in a series of ROOT files and so Uproot is necessary for dealing with the data. The project is built in python 3.10 and is built with Tensorflow and Keras as well as PyTorch Geometric.  The data used in this project was generated as a series of ROOT files with 10000 events in each and the data extraction can be seen in DataExtractor.py.
 
 Four different types of ANNs were trained for this task: A convolutional neural network (CNN), recurrent neural network (RNN), graph neural network (GNN), and a combined CNN and RNN neural network. The CNN, RNN, and combination networks were built using Tensorflow while the GNN were built using PyTorch Geometric. 
 
@@ -24,13 +24,12 @@ Combined CNN and RNN:
 
 The same array shape is used as for the CNN but the 34 or 35 now refers to the number of frames in the “video” that is being processed. Note that the array is reshaped into (34,7,450,1) and (35,8,450,1) as this becomes the expected shape for this type of network. An example can be seen in CRModelANN.py
 
+
 Note on Data Generation: 
-When generating the data a recommendation would be to save each event as a separate file. This allows for an easier time when 
+When generating the data a recommendation would be to save each event as a separate file. This allows for an easier time when using the generators later as changing the batch size becomes much easier to deal with. A generator only loads specific files at a time since trying to load all of the data at once overloads the RAM. 
 
-Note on Data Loading:
-
-
-For this project there was too much data to load it directly into memory. Therefore a generator is used 
+Note on Training:
+Start training with smaller datasets and find models that are viable at that size. Once a reasonable performance is reached for that smaller dataset expand to the larger and start to optimize for that total dataset. 
 
 
 Required Modules:
@@ -41,4 +40,5 @@ Required Modules:
 - [ ] Pytorch Geometric 
 - [ ] Networkx
 - [ ] Sklearn 
+
 
