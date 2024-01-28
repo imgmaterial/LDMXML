@@ -2,35 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd 
-
 import numpy as np
-
-import sys
-
-import matplotlib.pyplot as plt
-
-import numpy as np
-
-
-import importlib.util
-import sys
-
-import pandas as pd
-
-
-import csv #The files are saved in the csv format but if other formats are preferred then this can be changed but it will require changing all of the preprocessing scripts that rely on the files being csv
-
 import uproot as up
-
-
-
-
-DF = pd.read_csv('Directory/LIST.csv') #LIST is a list of file names that contains the root files with the data, each one contained 10000 data points for this specific project. This file can be produced using terminal commands such as ls>list while in the directory where the files are 
-
-DF.columns = ['0']
-
-NR = len(DF.axes[0])#Just get the number of rows in the file 
-
 
 class DataExtractor():#This class is for extracting different parts of the data from the different ROOT files using Uproot 
     def __init__(self,Inputname,OutputNumber,Length):
@@ -39,8 +12,7 @@ class DataExtractor():#This class is for extracting different parts of the data 
        self.Length = Length#This is the length of an array used to save the data so that it becomes uniform, for 1e the data used for this project had a maximum length of 155, 2e: 250, 3e:360, and 4e:450. 
         
     def Interloper(self):#Interloper is responsible for extracting the Energy and the EcalID of each ROOT file that contains 10000 events each. If the (X,Y,Z) coordinates want to be accessed then the file can be amended to save those as well
-       	l = 0  #Simply counts the iterations 
-        
+       	l = 0  #Simply counts the iterations
         for i in range(len(self.Inputname)):#This iterates through the different file names 
             EcalID = []#Each value is initially saved into a smaller list containing other hits from the event and are all appended to this list
             Energy = []
@@ -86,7 +58,6 @@ class DataExtractor():#This class is for extracting different parts of the data 
                            #XD = float(xpos[j][k]) #Loads the posiotnal value for each hit 
                            #YD = float(ypos[j][k]) 
                            #ZD = float(zpos[j][k]) 
-                         
                            EID[k] =  round(D,2)#Exchanges each hit value in the array from NAN to the EcalID
                            E[k] =  round(DE,2)#Exchanges each hit value in the array from NAN to the EcalID
                            #XM[k] = round(XD,2)
@@ -106,15 +77,15 @@ class DataExtractor():#This class is for extracting different parts of the data 
                  print("DataFrame: Done")
                      
                  if l ==0:#This creates the files on the first iteration and the rest of the data is then appended to the end of this file                                                         
-                          IDF.to_csv("/Directory/EcalID{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)#This converts the data frame object into a csv file, the chunksize is arbitrary but was found to be faster on my machine than just writing everything in 10000 chunks (Change as you see fit)
-                          EDF.to_csv("/Directory/Energy{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
+                          IDF.to_csv("Directory/EcalID{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)#This converts the data frame object into a csv file, the chunksize is arbitrary but was found to be faster on my machine than just writing everything in 10000 chunks (Change as you see fit)
+                          EDF.to_csv("Directory/Energy{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #XDF.to_csv("/Directory/X{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #YDF.to_csv("/Directory/Y{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #ZDF.to_csv("/Directory/Z{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           print("CSV: Done")
                  else:
-                          IDF.to_csv("/home/jacoblindahl/EcalID{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)#This simply appends the data to the already created file (mode='a')
-                          EDF.to_csv("/home/jacoblindahl/Energy{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                          IDF.to_csv("Directory/EcalID{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)#This simply appends the data to the already created file (mode='a')
+                          EDF.to_csv("Directory/Energy{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                           #XDF.to_csv("/Directory/X{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
                           #YDF.to_csv("/Directory/Y{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
                           #ZDF.to_csv("/Directory/Z{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
@@ -267,17 +238,6 @@ class DataExtractor():#This class is for extracting different parts of the data 
                                  EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                                  print("CSV: Done")
                          l = l+1
-
-
-DataExtractor(["/DataDirectory/{}".format(DF['0'][i]) for i in range(NR)],1,155).Interloper()#This calls the EcalID and Energy 
-
-DataExtractor(["/DataDirectory/{}".format(DF['0'][i]) for i in range(NR)],1,155).BREM()#This calls the BREM function
-
-DataExtractor(["/DataDirectory/{}".format(DF['0'][i]) for i in range(NR)],1,155).Trig()#This calls the Trig function 
-
-
-
-
 
 
 
