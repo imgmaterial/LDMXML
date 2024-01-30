@@ -135,22 +135,22 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                           elif Y2 == Y3:
+                            elif Y2 == Y3:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = 0
                                 B[3] = (Y4*1000+1)
-                          elif Y2 == Y4:
+                            elif Y2 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          elif Y3 == Y4:
+                            elif Y3 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          else:
+                            else:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
@@ -162,7 +162,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/4e{}.npz'.format(nc), B)
                     elif NRR <n:
@@ -262,22 +262,22 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                           elif Y2 == Y3:
+                            elif Y2 == Y3:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = 0
                                 B[3] = (Y4*1000+1)
-                          elif Y2 == Y4:
+                            elif Y2 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          elif Y3 == Y4:
+                            elif Y3 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          else:
+                            else:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
@@ -289,7 +289,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/4e{}.npz'.format(nc), B)
                     else:
@@ -389,22 +389,22 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                           elif Y2 == Y3:
+                            elif Y2 == Y3:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = 0
                                 B[3] = (Y4*1000+1)
-                          elif Y2 == Y4:
+                            elif Y2 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          elif Y3 == Y4:
+                            elif Y3 == Y4:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
                                 B[3] = 0
-                          else:
+                            else:
                                 B[0] = (Y1*1000+1)
                                 B[1] = (Y2*1000+1)
                                 B[2] = (Y3*1000+1)
@@ -416,7 +416,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i+4] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/4e{}.npz'.format(nc), B)
                     nTS = nTS+1

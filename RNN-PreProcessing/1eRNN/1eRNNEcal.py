@@ -14,14 +14,14 @@ import libDetDescr
 from libDetDescr import EcalID, HcalID,EcalTriggerID
 
 
-readerC = pd.read_csv("/Directory/EcalIDFile1.csv", chunksize=n)
+readerC = pd.read_csv("../Directory/EcalID1.csv", chunksize=n)
 
 
 for chunkC in readerC:
     nE = 0
     NRR = chunkC.shape[0]
     NC = chunkC.shape[1]
-    readerE = pd.read_csv("/Directory/Energy1.csv", chunksize=n)
+    readerE = pd.read_csv("../Directory/Energy1.csv", chunksize=n)
     for chunkE in readerE:
         #nTS = 0
         if nE<nc:
@@ -40,9 +40,9 @@ for chunkC in readerC:
                             C = EcalID(DD).cell()
                             M = EcalID(DD).module()
                             L = EcalID(DD).layer()
-                            B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])#Each hit is turned into a value using this formula that uses the Energy, Cell, Module, and Layer numbers. This formula is not absolute and is completely arbitrary, it did however have some sucess so modifications or similar versions are at least worth considering
+                            B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]#Each hit is turned into a value using this formula that uses the Energy, Cell, Module, and Layer numbers. This formula is not absolute and is completely arbitrary, it did however have some sucess so modifications or similar versions are at least worth considering
                     B = np.array(B)
-                    np.savez_compressed('/Directory/RNN/Ecal/1e{}.npz'.format(nc), B)#Saves the array to a file named for example 1e1.npz in the NPZ file format.
+                    np.savez_compressed('../Directory/RNN/Ecal/1e{}.npz'.format(nc), B)#Saves the array to a file named for example 1e1.npz in the NPZ file format.
             elif NRR <n:
                   for j in range(nc*n,nc*n+NRR):
                             B = np.zeros(shape = (155))
@@ -53,9 +53,9 @@ for chunkC in readerC:
                                         C = EcalID(DD).cell()
                                         M = EcalID(DD).module()
                                         L = EcalID(DD).layer()
-                                        B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                        B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
-                            np.savez_compressed('/Directory/RNN/Ecal/1e{}.npz'.format(nc), B)
+                            np.savez_compressed('../Directory/RNN/Ecal/1e{}.npz'.format(nc), B)
             else:
                 for j in range(nc*NRR,(nc+1)*NRR):
                             B = np.zeros(shape = (155))
@@ -66,8 +66,8 @@ for chunkC in readerC:
                                         C = EcalID(DD).cell()
                                         M = EcalID(DD).module()
                                         L = EcalID(DD).layer()
-                                        B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                        B[i] = (L)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
-                            np.savez_compressed('/Directory/RNN/Ecal/1e{}.npz'.format(nc), B)
+                            np.savez_compressed('../Directory/RNN/Ecal/1e{}.npz'.format(nc), B)
             nE = nE+1
     nc = nc+1

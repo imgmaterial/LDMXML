@@ -51,7 +51,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/1e{}.npz'.format(nc), B)#Saves the array to a file named for example 1e1.npz in the NPZ file format.
                     elif NRR <n:
@@ -67,7 +67,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/1e{}.npz'.format(nc), B)
                     else:
@@ -83,7 +83,7 @@ for chunkC in readerC:#Will iterate over the chunks of the read csv file
                                             C = EcalID(DD).cell()
                                             M = EcalID(DD).module()
                                             L = EcalID(DD).layer()
-                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j])
+                                            B[i] = (L+1)*10000000+1000000*(M)+1000*C+chunkE['{}'.format(i)][j]
                             B = np.array(B)
                             np.savez_compressed('/Directory/RNN/ETS/1e{}.npz'.format(nc), B)
                     nTS = nTS+1
