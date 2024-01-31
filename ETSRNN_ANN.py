@@ -31,9 +31,9 @@ import tensorflow as tf
 import os
 import shutil
 
-train_dir = 'DataDirectory'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
+train_dir = 'Output/Pre-Processing/RNN/ETS'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
 
-subdirs, dirs, files = os.walk('DataDirectory').__next__()#This will walk around the directory and pick out any files it discovers there 
+subdirs, dirs, files = os.walk('Output/Pre-Processing/RNN/ETS').__next__()#This will walk around the directory and pick out any files it discovers there 
 
 m = len(files)#This is the amount of files located in the directory 
 
@@ -93,7 +93,7 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
     
     
   def __len__(self): #This gets the number of iterations that have to be performed to loop through all of the data and casts it as an integer 
-    return (np.ceil(len(self.filenames) / float(self.batch_size))).astype(np.int)
+    return (np.ceil(len(self.filenames) / float(self.batch_size))).astype(int)
 
   def __getitem__(self, idx) :#This function actually loads the data 
     batch_x = self.filenames[idx * self.batch_size : (idx+1) * self.batch_size]#This gets the filenames in the batch and prepares for the data to be loaded 
@@ -104,13 +104,13 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
 
     
     for file_name in batch_x:#Loads each file with the filenames included 
-        A = np.load('DataDirectory/' + str(file_name))
+        A = np.load('Output/Pre-Processing/RNN/ETS/' + str(file_name))
         AA = A['arr_0']
         Array.append(AA)
-        Lengths.append(len(AA))
-        
-    ADone = np.array(Array)
-    print(ADone.shape[0])
+        #Lengths.append(len(AA))
+    #print(len(Array), len(Array[0]), len(Array[2]))    
+    ADone = Array
+    #print(ADone.shape[0])
     #To pass the data to a RNN network the arrays need to be the same length and so to ensure this the arrays are padded with zeros to ensure they all have a standardized length   
     ADone = tf.keras.preprocessing.sequence.pad_sequences(ADone, padding="post",maxlen = 454,dtype='float32')
     LL = []
@@ -128,9 +128,9 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
 
 
 
-my_training_batch_generator = My_Custom_Generator(X_train_filenames, y_train, Batch_size) #Loads the generator for the training data set 
+my_training_batch_generator = My_Custom_Generator(X_train_filenames, y_train, batch_size) #Loads the generator for the training data set 
 
-my_validation_batch_generator = My_Custom_Generator(X_val_filenames, y_val, Batch_size) #Loads the generator for the validation data set 
+my_validation_batch_generator = My_Custom_Generator(X_val_filenames, y_val, batch_size) #Loads the generator for the validation data set 
 
 
 from tensorflow.keras import layers #We use layers when loading the RNN model 
@@ -153,16 +153,16 @@ masking = keras.layers.Masking(mask_value=0)(inp)#Here we pass the input layer i
 lstm_1 = keras.layers.GRU(128, activation='tanh',return_sequences=True)(masking)#This is the first GRU layer and since return sequences is True this means that it can back propagate with the other GRU layers 
 
 
-lstm_2 = keras.layers.GRU(32, activation='tanh',return_sequences=True,recurrent_dropout=0.3)(lstm_1)#This layer also has recurrent dropout added in the layer 
+lstm_2 = keras.layers.GRU(32, activation='tanh',return_sequences=True,recurrent_dropout=0)(lstm_1)#This layer also has recurrent dropout added in the layer 
 
 
 
 
-lstm_e = keras.layers.GRU(32, activation='tanh',return_sequences=True,recurrent_dropout=0.3)(lstm_2)
+lstm_e = keras.layers.GRU(32, activation='tanh',return_sequences=True,recurrent_dropout=0)(lstm_2)
 
 
 
-lstm_3 = keras.layers.GRU(128, activation='tanh',recurrent_dropout=0.3)(lstm_e)
+lstm_3 = keras.layers.GRU(64, activation='tanh',recurrent_dropout=0)(lstm_e)
 
 
 
@@ -173,7 +173,7 @@ Dense1 = keras.layers.Dense(64,'relu')(lstm_3)#Adds a dense layer of interconnec
 Dense2 = keras.layers.Dense(32,'relu')(Dense1)
 
 
-Drop = keras.layers.Dropout(0.6)(Dense2)#A final dropout layer used to control validation set performance 
+Drop = keras.layers.Dropout(0)(Dense2)#A final dropout layer used to control validation set performance 
 
 
 DenseF = keras.layers.Dense(4,'softmax')(Drop)#A final output layer with the number of categories 
@@ -181,12 +181,12 @@ DenseF = keras.layers.Dense(4,'softmax')(Drop)#A final output layer with the num
 
 model = keras.models.Model(inputs=inp, outputs=DenseF) #This initilizes a model object that uses the input layer inp and the final dense layer DenseF as output  
 
-adam = Adam(learning_rate= 3e-4) #Defines the optimizer with the learning rate 
+adam = Adam(learning_rate= 0.0003) #Defines the optimizer with the learning rate 
 
 model.compile(optimizer=adam,loss='categorical_crossentropy',metrics = ['accuracy'])#This compiles the model with the Categorical cross entropy loss function and adam optimizer 
 
 #This starts the training of the network with only two iterations (epochs) being used with the RNNM saving the history of the network as well.
-RNNM = model.fit(my_training_batch_generator,epochs = 2,verbose = 1,validation_data = my_validation_batch_generator) #,callbacks=[EarlyStopping(patience=15)])
+RNNM = model.fit(my_training_batch_generator,epochs = 50,verbose = 1,validation_data = my_validation_batch_generator) #,callbacks=[EarlyStopping(patience=15)])
 
 model.summary()
 
@@ -198,8 +198,8 @@ plt.xlabel('Epoch')
 for k in RNNM.history.keys():#Can be used to plot the history of the network performance 
     plt.plot(RNNM.history[k], label = k) 
 plt.legend(loc='best')
-plt.show()
 plt.savefig("ModelHistory.png")
+plt.show()
 
 
 
