@@ -190,7 +190,7 @@ RNNM = model.fit(my_training_batch_generator,epochs = 50,verbose = 1,validation_
 
 model.summary()
 
-model.save("ModelNameHere")#Saves the model and can resume training after stopping 
+model.save("Models/RNNETS50")#Saves the model and can resume training after stopping 
 
 plt.figure()
 plt.ylabel('Loss / Accuracy')
@@ -198,9 +198,14 @@ plt.xlabel('Epoch')
 for k in RNNM.history.keys():#Can be used to plot the history of the network performance 
     plt.plot(RNNM.history[k], label = k) 
 plt.legend(loc='best')
-plt.savefig("ModelHistory.png")
+plt.savefig("Plots/RNNETS50.png")
 plt.show()
 
+reconstruct = keras.models.load_model("Models/RNNETS50")
+import lib.confusion_matrix as cm
+test_dataset = My_Custom_Generator(X_val_filenames, y_val, 30000)
+
+cm.make_cm_plot(reconstruct,test_dataset[0][0], test_dataset[0][1], 4)
 
 
 

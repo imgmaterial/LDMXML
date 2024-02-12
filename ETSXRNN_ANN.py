@@ -201,7 +201,11 @@ plt.legend(loc='best')
 plt.savefig("ModelHistory.png")
 plt.show()
 
+reconstruct = keras.models.load_model("Models/ETSX50Epoch")
+import lib.confusion_matrix as cm
+test_dataset = My_Custom_Generator(X_val_filenames, y_val, 30000)
 
+cm.make_cm_plot(reconstruct,test_dataset[0][0], test_dataset[0][1], 4)
 
 
 
