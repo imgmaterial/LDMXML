@@ -6,11 +6,11 @@ import numpy as np
 import uproot as up
 
 class DataExtractor():#This class is for extracting different parts of the data from the different ROOT files using Uproot 
-    def __init__(self,Inputname,OutputNumber,Length):
+    def __init__(self,Inputname,OutputNumber,Length, output_path = ""):
        self.Inputname  = Inputname #This is the name of the data file containing the data 
        self.OutputNumber  = OutputNumber #This number will be used to name our output file so for example EcalID1 if you input 1
        self.Length = Length#This is the length of an array used to save the data so that it becomes uniform, for 1e the data used for this project had a maximum length of 155, 2e: 250, 3e:360, and 4e:450. 
-        
+       self.output_path = output_path 
     def Interloper(self):#Interloper is responsible for extracting the Energy and the EcalID of each ROOT file that contains 10000 events each. If the (X,Y,Z) coordinates want to be accessed then the file can be amended to save those as well
        	l = 0  #Simply counts the iterations
         for i in range(len(self.Inputname)):#This iterates through the different file names 
@@ -77,15 +77,15 @@ class DataExtractor():#This class is for extracting different parts of the data 
                  print("DataFrame: Done")
                      
                  if l ==0:#This creates the files on the first iteration and the rest of the data is then appended to the end of this file                                                         
-                          IDF.to_csv("Directory/EcalID{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)#This converts the data frame object into a csv file, the chunksize is arbitrary but was found to be faster on my machine than just writing everything in 10000 chunks (Change as you see fit)
-                          EDF.to_csv("Directory/Energy{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
+                          IDF.to_csv(self.output_path + "EcalID{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)#This converts the data frame object into a csv file, the chunksize is arbitrary but was found to be faster on my machine than just writing everything in 10000 chunks (Change as you see fit)
+                          EDF.to_csv(self.output_path + "Energy{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #XDF.to_csv("/Directory/X{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #YDF.to_csv("/Directory/Y{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           #ZDF.to_csv("/Directory/Z{}.csv".format(self.OutputNumber),mode='w',chunksize=5000,index=False)
                           print("CSV: Done")
                  else:
-                          IDF.to_csv("Directory/EcalID{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)#This simply appends the data to the already created file (mode='a')
-                          EDF.to_csv("Directory/Energy{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                          IDF.to_csv(self.output_path + "EcalID{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)#This simply appends the data to the already created file (mode='a')
+                          EDF.to_csv(self.output_path + "Energy{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                           #XDF.to_csv("/Directory/X{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
                           #YDF.to_csv("/Directory/Y{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
                           #ZDF.to_csv("/Directory/Z{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False)
@@ -122,7 +122,7 @@ class DataExtractor():#This class is for extracting different parts of the data 
 
         Data = {"EN":EventNumber, "PN": PhotonNumber}#Our data will have two columns: EN for event number and PN for photon number 
         DDF = pd.DataFrame(Data)#This converts our data into a dataframe 
-        DDF.to_csv("Brem{}.csv".format(self.OutputNumber))#Converts to a csv file 
+        DDF.to_csv(self.output_path + "Brem{}.csv".format(self.OutputNumber))#Converts to a csv file 
     def  Trig(self):#This function aims to extract the positional data of the incident electrons on the Trigger Scintillator, this is then used to convert into module and cell number for use in the opther datasets 
          x = []#Here we save the x-coordinate data 
          y = []#Here we save the y-coordinate data 
@@ -158,11 +158,11 @@ class DataExtractor():#This class is for extracting different parts of the data 
                      
                          if l ==0:
                                 DCF = pd.DataFrame(columns = ['X1','Y1'])#Creates a dataframe with two columns 
-                                DCF.to_csv("POS{}.csv".format(self.OutputNumber), mode="w",index=False)#Creates the positional data
-                                EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)#Appends the data to the created file 
+                                DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)#Creates the positional data
+                                EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)#Appends the data to the created file 
                                 print("CSV: Done")
                          else:
-                                 EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                                 EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                                  print("CSV: Done")
                          l = l+1
                  elif B==2:#This deals with two electron events 
@@ -180,11 +180,11 @@ class DataExtractor():#This class is for extracting different parts of the data 
                      
                          if l ==0:
                                 DCF = pd.DataFrame(columns = ['X1','Y1','X2','Y2'])#Now have two hits so save them here 
-                                DCF.to_csv("POS{}.csv".format(self.OutputNumber), mode="w",index=False)
-                                EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
+                                DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
+                                EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
                                 print("CSV: Done")
                          else:
-                                 EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                                 EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                                  print("CSV: Done")
                          l = l+1
 
@@ -205,11 +205,11 @@ class DataExtractor():#This class is for extracting different parts of the data 
                      
                          if l ==0:
                                 DCF = pd.DataFrame(columns = ['X1','Y1','X2','Y2','X3','Y3'])#Now have three positions 
-                                DCF.to_csv("POS{}.csv".format(self.OutputNumber), mode="w",index=False)
-                                EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
+                                DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
+                                EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
                                 print("CSV: Done")
                          else:
-                                 EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                                 EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                                  print("CSV: Done")
                          l = l+1
                  elif B==4:#Deals with 4 electron events 
@@ -231,11 +231,11 @@ class DataExtractor():#This class is for extracting different parts of the data 
                      
                          if l ==0:
                                 DCF = pd.DataFrame(columns = ['X1','Y1','X2','Y2','X3','Y3','X4','Y4'])#Now have 4 positional values to deal with 
-                                DCF.to_csv("POS{}.csv".format(self.OutputNumber), mode="w",index=False)
-                                EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
+                                DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
+                                EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
                                 print("CSV: Done")
                          else:
-                                 EDF.to_csv("POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
+                                 EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
                                  print("CSV: Done")
                          l = l+1
 
