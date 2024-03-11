@@ -31,9 +31,9 @@ import tensorflow as tf
 import os
 import shutil
 
-train_dir = 'Output/Pre-Processing/RNN/Ecal'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
+train_dir = '/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/RNN_2mil_Ecal'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
 
-subdirs, dirs, files = os.walk('Output/Pre-Processing/RNN/Ecal').__next__()#This will walk around the directory and pick out any files it discovers there 
+subdirs, dirs, files = os.walk('/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/RNN_2mil_Ecal').__next__()#This will walk around the directory and pick out any files it discovers there 
 
 m = len(files)#This is the amount of files located in the directory 
 
@@ -104,7 +104,7 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
 
     
     for file_name in batch_x:#Loads each file with the filenames included 
-        A = np.load('Output/Pre-Processing/RNN/Ecal/' + str(file_name))
+        A = np.load('/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/RNN_2mil_Ecal/' + str(file_name))
         AA = A['arr_0']
         Array.append(AA)
         #Lengths.append(len(AA))
@@ -186,11 +186,11 @@ adam = Adam(learning_rate= 0.0001) #Defines the optimizer with the learning rate
 model.compile(optimizer=adam,loss='categorical_crossentropy',metrics = ['accuracy'])#This compiles the model with the Categorical cross entropy loss function and adam optimizer 
 
 #This starts the training of the network with only two iterations (epochs) being used with the RNNM saving the history of the network as well.
-RNNM = model.fit(my_training_batch_generator,epochs = 50,verbose = 1,validation_data = my_validation_batch_generator) #,callbacks=[EarlyStopping(patience=15)])
+RNNM = model.fit(my_training_batch_generator,epochs = 15,verbose = 1,validation_data = my_validation_batch_generator) #,callbacks=[EarlyStopping(patience=15)])
 
 model.summary()
 
-model.save("ModelNameHere")#Saves the model and can resume training after stopping 
+model.save("Models/RNNEcal2mil15")#Saves the model and can resume training after stopping 
 
 plt.figure()
 plt.ylabel('Loss / Accuracy')
@@ -198,12 +198,12 @@ plt.xlabel('Epoch')
 for k in RNNM.history.keys():#Can be used to plot the history of the network performance 
     plt.plot(RNNM.history[k], label = k) 
 plt.legend(loc='best')
-plt.savefig("ModelHistory.png")
+plt.savefig("Plots/RNNEcal2mil15.png")
 plt.show()
 
-reconstruct = keras.models.load_model("Models/EcalRNN50Epoch")
+reconstruct = keras.models.load_model("Models/RNNEcal2mil15")
 import lib.confusion_matrix as cm
-test_dataset = My_Custom_Generator(X_val_filenames, y_val, 30000)
+test_dataset = My_Custom_Generator(X_val_filenames, y_val, 100000)
 
 cm.make_cm_plot(reconstruct,test_dataset[0][0], test_dataset[0][1], 4)
 
