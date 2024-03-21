@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+from lib.pre_processing_help import process_coordinates, process_value
 from libDetDescr import EcalID, HcalID,EcalTriggerID
 
-def RNN_Ecal(event_multiplicity:int,ecal_path:str, energy_path:str,tspos_path:str, output_path:str, chunk_size:int = 1000, max_hits:int = 454):
+def RNN_ETSX(event_multiplicity:int,ecal_path:str, energy_path:str,tspos_path:str, output_path:str, chunk_size:int = 1000, max_hits:int = 454):
     readerEcal = pd.read_csv(ecal_path, chunksize=chunk_size)
     for indexEcal, chunkEcal in enumerate(readerEcal):
         readerEnergy = pd.read_csv(energy_path,chunksize=chunk_size)
@@ -16,15 +17,19 @@ def RNN_Ecal(event_multiplicity:int,ecal_path:str, energy_path:str,tspos_path:st
             if (indexEcal == indexTspos):
                 chunkTspos = _chunkTspos
                 break
+        number_of_tspos_columns = len(chunkTspos.columns)
+        amount_of_coordinates = int(number_of_tspos_columns/2)
         for j in range(indexEcal*chunk_size,indexEcal*chunk_size+number_of_rows):
-            B = np.zeros(shape = (max_hits + event_multiplicity))
-            y_list = [int(chunkTspos['Y{}'.format(str(i))][j]) for i in range(1, event_multiplicity + 1)]
-            x_list = [int(chunkTspos['X{}'.format(str(i))][j]) for i in range(1, event_multiplicity + 1)]
-            xy_list = combine_like_entries(y_list, x_list)
-            for i in range(event_multiplicity):
-                B[i] = (xy_list[i])
-            for i in range(event_multiplicity, max_hits + event_multiplicity):
-                D = chunkEcal['{}'.format(i)][j]
+            y_list = [process_value(chunkTspos['Y{}'.format(str(i))][j]) for i in range(1, amount_of_coordinates + 1)]
+            x_list = [process_value(chunkTspos['X{}'.format(str(i))][j]) for i in range(1, amount_of_coordinates + 1)]
+            coordinate_tuple = process_coordinates((x_list, y_list),amount_of_coordinates)
+            combined_ts_coordinates = np.unique(combine_coordinates(coordinate_tuple[1], coordinate_tuple[0]))
+            hit_amount = len(combined_ts_coordinates)
+            B = np.zeros(shape = (max_hits + hit_amount))
+            for i in range(hit_amount):
+                B[i] = (combined_ts_coordinates[i])
+            for i in range(hit_amount, max_hits + hit_amount):
+                D = chunkEcal['{}'.format(i - hit_amount)][j]
                 if pd.isna(D) == False and pd.isna(chunkEnergy['{}'.format(i)][j])==False:
                     DD = int(D)
                     C = EcalID(DD).cell()
@@ -33,10 +38,6 @@ def RNN_Ecal(event_multiplicity:int,ecal_path:str, energy_path:str,tspos_path:st
                     B[i] = (L)*10000000+1000000*(M)+1000*C+chunkEnergy['{}'.format(i)][j]
             np.savez_compressed(output_path+'{}e{:03}_{:03}.npz'.format(event_multiplicity,indexEcal,j - indexEcal*chunk_size), B)
         
-def combine_like_entries(y_list:list, x_list:list):
+def combine_coordinates(y_list:list, x_list:list):
     combined_list = [(x_list[i]*1000000+y_list[i]*1000+1) for i in range(len(y_list))]
-    for i in range(len(combined_list)):
-        for j in range(i+1,len(combined_list)):
-            if (combined_list[i] == combined_list[j]):
-                combined_list[j] = 0
     return combined_list

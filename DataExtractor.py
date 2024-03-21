@@ -19,7 +19,7 @@ class DataExtractor():#This class is for extracting different parts of the data 
             tree = up.open(self.Inputname[i])#Opens up the ROOT file 
             KEYS = tree.keys()#This extracts the name of the events in the ROOT file, if everything has gone well during data production the length of this should be non-zero
             if len(KEYS)>0:#This means that we only try and load data from files that actually have keys as otherwise it cannot be loaded.
-                branches = tree[KEYS[0]]["EcalRecHits_sim"].arrays(library = "np")#This loads all the data from the simulated Ecal 
+                branches = tree[KEYS[1]]["EcalRecHits_sim"].arrays(library = "np")#This loads all the data from the simulated Ecal 
                 IDS = branches["EcalRecHits_sim.id_"]#This loads the EcalID data from all the events in the ROOT file 
                 ES = branches["EcalRecHits_sim.energy_"]#This loads the energy data from all the events in the ROOT file 
                 for j in range(len(IDS)):#This will iterate through the length of total events in the EcalID file 
@@ -52,10 +52,10 @@ class DataExtractor():#This class is for extracting different parts of the data 
             KEYS = tree.keys()
             print(KEYS)
             if len(KEYS) >0:
-                B3 = tree[KEYS[0]]["EcalScoringPlaneHits_sim"].arrays(library = "np")#This loads data from the scoring plane of the simulated Ecal 
+                B3 = tree[KEYS[1]]["EcalScoringPlaneHits_sim"].arrays(library = "np")#This loads data from the scoring plane of the simulated Ecal 
                 EScoring  = B3["EcalScoringPlaneHits_sim.energy_"]#This loads the energy of the incident particles that can now be electrons, photons, or other particles produced 
                 PDGScoring = B3["EcalScoringPlaneHits_sim.pdgID_"]#The pdgID helps identify what type of particle has hit the scoring plane 
-                B4 = tree[KEYS[0]]["EcalVeto_sim"].arrays(library = "np")#We load this data from the EcalVeto to determine if there are photons in the event to begin with 
+                B4 = tree[KEYS[1]]["EcalVeto_sim"].arrays(library = "np")#We load this data from the EcalVeto to determine if there are photons in the event to begin with 
                 PH = B4["photonContainmentEnergy_"]#We use the photon Containment Energy to determine if there are photons passing through the Ecal
                 for j in range(len(EScoring)):#This goes through the data points in the scoring plane 
                     if np.sum(PH[j]) !=0:#We sum over the photon containment energy and if it is non-zero that indicates that photons were produced in the event and so we start to try and determine how many 
@@ -82,7 +82,7 @@ class DataExtractor():#This class is for extracting different parts of the data 
             KEYS = tree.keys()
             print(KEYS)
             if len(KEYS)>0:
-                branches = tree[KEYS[0]]["TrigScintScoringPlaneHits_sim"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
+                branches = tree[KEYS[1]]["TrigScintScoringPlaneHits_sim"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
                 XPOS = branches["TrigScintScoringPlaneHits_sim.x_"]#The x-coordinate data 
                 YPOS = branches["TrigScintScoringPlaneHits_sim.y_"]#The y-coordinate data 
                 if B ==1:#If B==1 then we use the version for 1 electron events 
@@ -172,40 +172,29 @@ class DataExtractor():#This class is for extracting different parts of the data 
                         print("CSV: Done")
                     l = l+1
     def TSPOS(self):
-        x = []#Here we save the x-coordinate data 
-        y = []#Here we save the y-coordinate data 
-        B = self.OutputNumber#This number simply tells us which type of event is being considered 
-        l = 0
+        Positions = []
         for i in range(len(self.Inputname)):#Loopd over the files 
-            Positions = []
             tree = up.open(self.Inputname[i])
             KEYS = tree.keys()
             if len(KEYS)>0:
-                if (self.OutputNumber == 1):
-                    branches = tree[KEYS[0]]["BeamElectronTruthInfo_sim"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
-                    XPOS = branches["BeamElectronTruthInfo_sim.barX_"]#The x-coordinate data 
-                    YPOS = branches["BeamElectronTruthInfo_sim.barY_"]#The y-coordinate data
-                else:
-                    branches = tree[KEYS[0]]["BeamElectronTruthInfo_overlay"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
-                    XPOS = branches["BeamElectronTruthInfo_overlay.barX_"]#The x-coordinate data 
-                    YPOS = branches["BeamElectronTruthInfo_overlay.barY_"]#The y-coordinate data
+                branches = tree[KEYS[1]]["BeamElectronTruthInfo_sim"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
+                XPOS = branches["BeamElectronTruthInfo_sim.barX_"]#The x-coordinate data 
+                YPOS = branches["BeamElectronTruthInfo_sim.barY_"]#The y-coordinate data
                 for j in range(len(XPOS)):
-                    POS = np.zeros(self.OutputNumber*2)
-                    for i in range(self.OutputNumber):
+                    POS = np.zeros(len(XPOS[j])*2, dtype=int)
+                    for i in range(len(XPOS[j])):
                         POS[i*2] = XPOS[j][i]
                         POS[i*2 + 1] = YPOS[j][i]
-                        Positions.append(POS)
-                print(len(Positions))
-                EDF = pd.DataFrame(Positions)
-                if l ==0:
-                    DCF = pd.DataFrame(columns = [(x + "{}".format(i)) for i in range(1, self.OutputNumber+1) for x in ("X", "Y")])#creates a header for the csv based on the OutputNumber parameter
-                    DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
-                    EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False,header=False)
-                    print("CSV: Done")
-                else:
-                    EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',chunksize=5000,index=False, header=False)
-                    print("CSV: Done")
-                l = l+1
+                    Positions.append(POS)
+            EDF = pd.DataFrame(Positions)
+            total_columns = int(len(EDF.columns)/2)
+        DCF = pd.DataFrame(columns = [(x + "{}".format(i)) for i in range(1, total_columns+1) for x in ("X", "Y")])#creates a header for the csv based on the OutputNumber parameter
+        DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
+        EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',index=False,header=False)
+        print("CSV: Done")
+
+    
+
 
 
 
