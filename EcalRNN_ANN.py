@@ -104,7 +104,7 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
 
     
     for file_name in batch_x:#Loads each file with the filenames included 
-        A = np.load('/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/RNN_2mil_Ecal/' + str(file_name))
+        A = np.load('     ' + str(file_name))
         AA = A['arr_0']
         Array.append(AA)
         #Lengths.append(len(AA))
