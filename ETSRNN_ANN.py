@@ -31,9 +31,9 @@ import tensorflow as tf
 import os
 import shutil
 
-train_dir = 'Output/Pre-Processing/RNN/ETS'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
+train_dir = '/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/8mil_processing/RNNETS'#This is wherever you have saved the data that was produced after preprocessing that you want to feed to your network  
 
-subdirs, dirs, files = os.walk('Output/Pre-Processing/RNN/ETS').__next__()#This will walk around the directory and pick out any files it discovers there 
+subdirs, dirs, files = os.walk('/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/8mil_processing/RNNETS').__next__()#This will walk around the directory and pick out any files it discovers there 
 
 m = len(files)#This is the amount of files located in the directory 
 
@@ -104,7 +104,7 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
 
     
     for file_name in batch_x:#Loads each file with the filenames included 
-        A = np.load('Output/Pre-Processing/RNN/ETS/' + str(file_name))
+        A = np.load('/projects/hep/fs9/shared/ldmx/users/pa8701os/LDMXML/8mil_processing/RNNETS/' + str(file_name))
         AA = A['arr_0']
         Array.append(AA)
         #Lengths.append(len(AA))
@@ -112,7 +112,7 @@ class My_Custom_Generator(keras.utils.Sequence):#This is a generator that will l
     ADone = Array
     #print(ADone.shape[0])
     #To pass the data to a RNN network the arrays need to be the same length and so to ensure this the arrays are padded with zeros to ensure they all have a standardized length   
-    ADone = tf.keras.preprocessing.sequence.pad_sequences(ADone, padding="post",maxlen = 454,dtype='float32')
+    ADone = tf.keras.preprocessing.sequence.pad_sequences(ADone, padding="post",maxlen = 500,dtype='float32')
     LL = []
 
     for i in batch_y:#Loop through the labels 
@@ -145,7 +145,7 @@ from tensorflow.keras import regularizers #Regularizers can be used to affect va
 masking_layer = layers.Masking() #The masking layer tells the network what it should ignore in our case we want it to ignore zeros but we start by intilizing it here 
 
 
-inp = Input(shape=(454, 1)) #The input shape of our arrays that have all been standardized 
+inp = Input(shape=(500, 1)) #The input shape of our arrays that have all been standardized 
 
 
 masking = keras.layers.Masking(mask_value=0)(inp)#Here we pass the input layer inp to the masking layer and tell it that it should ignore the mask values 0
@@ -185,28 +185,14 @@ adam = Adam(learning_rate= 0.0003) #Defines the optimizer with the learning rate
 
 model.compile(optimizer=adam,loss='categorical_crossentropy',metrics = ['accuracy'])#This compiles the model with the Categorical cross entropy loss function and adam optimizer 
 
+from keras.callbacks import ModelCheckpoint
+checkpoint = ModelCheckpoint(filepath='Checkpoints/RNNETS8mil1ep',save_best_only=True, monitor='accuracy', mode='max', save_freq=1000, verbose=1) 
 #This starts the training of the network with only two iterations (epochs) being used with the RNNM saving the history of the network as well.
-RNNM = model.fit(my_training_batch_generator,epochs = 50,verbose = 1,validation_data = my_validation_batch_generator) #,callbacks=[EarlyStopping(patience=15)])
+RNNM = model.fit(my_training_batch_generator,epochs = 1,verbose = 1,validation_data = my_validation_batch_generator, callbacks=[checkpoint]) #,callbacks=[EarlyStopping(patience=15)])
 
 model.summary()
 
-model.save("Models/RNNETS50")#Saves the model and can resume training after stopping 
-
-plt.figure()
-plt.ylabel('Loss / Accuracy')
-plt.xlabel('Epoch')
-for k in RNNM.history.keys():#Can be used to plot the history of the network performance 
-    plt.plot(RNNM.history[k], label = k) 
-plt.legend(loc='best')
-plt.savefig("Plots/RNNETS50.png")
-plt.show()
-
-reconstruct = keras.models.load_model("Models/RNNETS50")
-import lib.confusion_matrix as cm
-test_dataset = My_Custom_Generator(X_val_filenames, y_val, 30000)
-
-cm.make_cm_plot(reconstruct,test_dataset[0][0], test_dataset[0][1], 4)
-
+model.save("Models/RNNETS8mil1")#Saves the model and can resume training after stopping 
 
 
 

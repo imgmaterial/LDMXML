@@ -76,6 +76,7 @@ class DataExtractor():#This class is for extracting different parts of the data 
         for i in range(len(self.Inputname)):#Loopd over the files 
             tree = up.open(self.Inputname[i])
             KEYS = tree.keys()
+            number_of_events = 0
             if len(KEYS)>0:
                 branches = tree[KEYS[1]]["BeamElectronTruthInfo_sim"].arrays(library = "np")#We load the TrigScintScoringPlaneHits_sim from the file 
                 XPOS = branches["BeamElectronTruthInfo_sim.barX_"]#The x-coordinate data 
@@ -86,14 +87,75 @@ class DataExtractor():#This class is for extracting different parts of the data 
                         POS[i*2] = XPOS[j][i]
                         POS[i*2 + 1] = YPOS[j][i]
                     Positions.append(POS)
+                    number_of_events += 1
             EDF = pd.DataFrame(Positions)
             total_columns = int(len(EDF.columns)/2)
+            #print("file {} has {} events".format(self.Inputname[i], number_of_events))
         DCF = pd.DataFrame(columns = [(x + "{}".format(i)) for i in range(1, total_columns+1) for x in ("X", "Y")])#creates a header for the csv based on the OutputNumber parameter
         DCF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber), mode="w",index=False)
         EDF.to_csv(self.output_path + "POS{}.csv".format(self.OutputNumber),mode='a',index=False,header=False)
         print("CSV: Done")
 
-    
+    def EventNumber(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["EventHeader/eventNumber_"].arrays(library = "np")
+                events = branches["eventNumber_"]
+                for j in range(len(events)):
+                    print("event 1",events[j])
+    def TotalEnergy(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["EcalVeto_sim/summedDet_"].arrays(library = "np")
+                events = branches["summedDet_"]
+                print(events)
+                return(events)
+    def AmountOfReadoutHits(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["EcalVeto_sim"].arrays(library = "np")
+                events = branches["nReadoutHits_"]
+                print(len(events))
+                print(min(events))
+                print(max(events))
+                return(events)
+    def DeepestLayer(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["EcalVeto_sim"].arrays(library = "np")
+                events = branches["deepestLayerHit_"]
+                print(events)
+                print(min(events))
+                print(max(events))
+                return(events)
+    def NumberOfStraightTracks(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["EcalVeto_sim"].arrays(library = "np")
+                events = branches["nStraightTracks_"]
+                print(events)
+                print(min(events))
+                print(max(events))
+                return(events)
+    def TriggerPadTracks(self):
+        for i in range(len(self.Inputname)):
+            tree = up.open(self.Inputname[i])
+            KEYS = tree.keys()
+            if len(KEYS)>0:
+                branches = tree[KEYS[1]]["TriggerPadTracksY_sim/TriggerPadTracksY_sim.y_"].arrays(library = "np")
+                events = branches["TriggerPadTracksY_sim.y_"]
+                events = [len(i) for i in events]
+                return(events)
 
 
 
